@@ -1,12 +1,14 @@
 package data;
 
 public class Klients implements TableData {
+    private int id;
     private String firm;
     private String country;
     private String adress;
     private int tfnumber;
 
-    public Klients(String firm, String country, String adress, int tfnumber) {
+    public Klients(int id, String firm, String country, String adress, int tfnumber) {
+        this.id = id;
         this.firm = firm;
         this.country = country;
         this.adress = adress;
@@ -43,5 +45,13 @@ public class Klients implements TableData {
 
     public void setTfnumber(int tfnumber) {
         this.tfnumber = tfnumber;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 }

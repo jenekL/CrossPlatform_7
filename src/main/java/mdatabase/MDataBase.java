@@ -2,15 +2,15 @@ package mdatabase;
 
 import data.Klients;
 import data.Prodaja;
-import data.TableData;
 import data.Zakupka;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MDataBase {
     private final String URL = "jdbc:mysql://localhost:3306/krosp_lab5?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC";
+    //private final String URL = "jdbc:mysql://localhost:3306/krosp_lab5";
     private final String NAME = "root";
     private final String PASS = "123ALOALOPRIVATEnetrogayte123";
     private Statement stmt;
@@ -18,7 +18,8 @@ public class MDataBase {
     private Statement stmt2;
     private Connection connection;
     private ResultSet rs;
-    private ObservableList<TableData> tableData = FXCollections.observableArrayList();
+    private ArrayList<Prodaja> tableData = new ArrayList<Prodaja>();
+
     private static MDataBase instance;
 
     private MDataBase() {
@@ -40,12 +41,12 @@ public class MDataBase {
         return instance;
     }
 
-    public ObservableList<TableData> createEntity(){
+    public ArrayList<Prodaja> createEntity(){
         try {
             rs = stmt.executeQuery("SELECT * FROM тПродажа");
             ResultSetMetaData resultSetMetaData = rs.getMetaData();
 
-            System.out.println(resultSetMetaData.getColumnCount());
+            //System.out.println(resultSetMetaData.getColumnCount());
             while (rs.next()) {
 
                 ResultSet resZakup = stmt1.executeQuery("SELECT * FROM тзакупка where Код_товара = " + rs.getString(4));
@@ -53,9 +54,10 @@ public class MDataBase {
 
                 while(resZakup.next() && resKlient.next()) {
                     tableData.add(new Prodaja(Integer.parseInt(rs.getString(1)), rs.getString(2), Integer.parseInt(rs.getString(3)),
-                            new Klients(resKlient.getString(2), resKlient.getString(3), resKlient.getString(4), Integer.parseInt(resKlient.getString(5))),
-                            new Zakupka(resZakup.getString(2), Float.parseFloat(resZakup.getString(3)), resZakup.getString(4))));
-                    System.out.println(Integer.parseInt(rs.getString(1)) + rs.getString(2) + Integer.parseInt(rs.getString(3)));
+                            new Klients(Integer.parseInt(resKlient.getString(1)), resKlient.getString(2), resKlient.getString(3), resKlient.getString(4), Integer.parseInt(resKlient.getString(5))),
+                            new Zakupka(Integer.parseInt(resZakup.getString(1)), resZakup.getString(2), Float.parseFloat(resZakup.getString(3)), resZakup.getString(4))));
+                    //System.out.println(Integer.parseInt(rs.getString(1)) + rs.getString(2) + Integer.parseInt(rs.getString(3)));
+                    //System.out.println(tableData.get(1).toString());
                 }
             }
 
@@ -66,29 +68,62 @@ public class MDataBase {
         return tableData;
     }
 
-    public String showTable(String tableName) {
-        String str = " ";
+    public List<Klients> createClientsEntity(){
+        List<Klients> klientsArrayList = new ArrayList<>();
         try {
-            String[] data = new String[5];
-            rs = stmt.executeQuery("SELECT * FROM " + tableName);
+            rs = stmt.executeQuery("SELECT * FROM тклиенты");
             ResultSetMetaData resultSetMetaData = rs.getMetaData();
-            System.out.println(resultSetMetaData.getColumnCount());
+
+
+            //System.out.println(resultSetMetaData.getColumnCount());
             while (rs.next()) {
-                str = " ";
-                for(int i = 1; i <= resultSetMetaData.getColumnCount(); i++ ) {
-                    data[i-1] = rs.getString(i);
-                    str += rs.getString(i)+ " ";
-                }
 
-                System.out.println("Продукция:" + str);
-
+                klientsArrayList.add(new Klients(Integer.parseInt(rs.getString(1)), rs.getString(2),
+                        rs.getString(3), rs.getString(4), Integer.parseInt(rs.getString(5))));
             }
-
-
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return str;
+        return klientsArrayList;
+    }
+
+    public List<Zakupka> createZakupkaEntity(){
+        List<Zakupka> zakupkaArrayList = new ArrayList<>();
+        try {
+            rs = stmt.executeQuery("SELECT * FROM тзакупка");
+
+            while (rs.next()) {
+
+                zakupkaArrayList.add(new Zakupka(Integer.parseInt(rs.getString(1)), rs.getString(2),
+                        Float.parseFloat(rs.getString(3)),rs.getString(4)));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return zakupkaArrayList;
+    }
+
+    public  ArrayList<String[]> showTable(String tableName) {
+        ArrayList<String[]> data = new ArrayList<String[]>();
+        String[] tmp;
+
+        try {
+
+            rs = stmt.executeQuery("SELECT * FROM " + tableName);
+            ResultSetMetaData resultSetMetaData = rs.getMetaData();
+           // System.out.println(resultSetMetaData.getColumnCount());
+            while (rs.next()) {
+                tmp = new String[resultSetMetaData.getColumnCount()];
+                for(int i = 1; i <= resultSetMetaData.getColumnCount(); i++ ) {
+                    tmp[i - 1] = rs.getString(i);
+                    //str += rs.getString(i)+ " ";
+                }
+                data.add(tmp);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return data;
     }
 
     public void addRow(String tableName, String[] data) throws SQLException {

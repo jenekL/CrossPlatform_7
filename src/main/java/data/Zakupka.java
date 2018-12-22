@@ -1,11 +1,13 @@
 package data;
 
 public class Zakupka implements TableData {
+    private int id;
     private String name;
     private float price;
     private String unit;
 
-    public Zakupka(String name, float price, String unit) {
+    public Zakupka(int id, String name, float price, String unit) {
+        this.id = id;
         this.name = name;
         this.price = price;
         this.unit = unit;
@@ -33,5 +35,13 @@ public class Zakupka implements TableData {
 
     public void setUnit(String unit) {
         this.unit = unit;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 }

@@ -17,6 +17,17 @@ public class Prodaja implements TableData {
         this.zakupka = zakupka;
     }
 
+    @Override
+    public String toString() {
+        return "Prodaja{" +
+                "id=" + id +
+                ", date='" + date + '\'' +
+                ", quantity=" + quantity +
+                ", klients=" + klients +
+                ", zakupka=" + zakupka +
+                '}';
+    }
+
     public String getFirm() {
         return klients.getFirm();
     }
